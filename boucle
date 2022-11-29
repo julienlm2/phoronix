@@ -1,0 +1,127 @@
+#!/usr/bin/env python
+
+from subprocess import run
+from ast import Break
+from datetime import datetime
+import subprocess
+import os
+import platform
+import time
+import math
+import sys
+import csv
+
+#______________________________________
+ARRAY_TIME = []
+ARRAY_CPU_USAGE = []
+#______________________________________
+
+username = os.getlogin()
+
+if len(sys.argv) > 3 or len(sys.argv) == 2 or len(sys.argv) == 1:
+    print("Erreur, Le Script prend 2 parametre (Temps d'execution et Nom (plusieurs caractères))")
+    exit()
+temps_voulu = int(sys.argv[1])
+log_name=str(sys.argv[2])
+
+temps_fin = time.time() + temps_voulu
+
+temperature = 0.0
+ARRAY_TEMPERATURE = []
+
+trigger = True
+
+now = datetime.now()
+today = datetime.now()
+current_time = now.strftime("%H:%M:%S")
+current_day = now.strftime("%d-%m-%y")
+f = open('/home/'+username+'/.phoronix-test-suite/test-results/log_temp_'+log_name+'_'+current_day+'_'+current_time+'.txt', 'w')
+count = 0
+while(time.time()<temps_fin and trigger):
+    count = 0
+    now = datetime.now()
+
+    current_time = now.strftime("%H:%M:%S.%f")[:-3]
+
+
+
+    Info_Sensors_Brut = run("sensors", capture_output=True).stdout
+    Info_Usage_Brut = run(["mpstat","-P","ALL","2","1"], capture_output=True).stdout
+
+
+
+    for line in Info_Sensors_Brut.splitlines():
+        if "Core 0" in line.decode('utf-8'):
+
+                    line_split = line.decode('utf-8').split("+")
+                
+                    temp = line_split[1]
+            
+                    temp_split = temp.split("°")
+                    temperature = float(temp_split[0])
+
+                    for line in Info_Usage_Brut.splitlines():
+                        if "all" in line.decode('utf-8') and count == 0:
+                            count = 1
+                            line_split_usage = line.decode('utf-8').split("   ")
+                            usage = line_split_usage[1]
+
+                           
+                            print("Cpu :"+str(usage)+"%",end='  ')
+                            f.write("Cpu :"+str(usage)+"%  ")
+                            #-----------CSV----------------
+                            ARRAY_CPU_USAGE.append(usage)
+                            #------------------------------
+                    #-----------CSV----------------
+                    ARRAY_TIME.append(current_time)
+                    #------------------------------
+
+                    print(str(temperature)+"C","["+str(current_time)+"]")
+                    f.writelines(str(temperature)+"C")
+                    f.writelines("  ["+str(current_time)+"]\n")
+
+                    ARRAY_TEMPERATURE.append(temperature)
+                    
+                    
+                    MAX = ARRAY_TEMPERATURE[0]
+                    for i in range (len(ARRAY_TEMPERATURE)):
+                       if (ARRAY_TEMPERATURE[i]>MAX):
+                            MAX = ARRAY_TEMPERATURE[i]
+
+                    MIN = ARRAY_TEMPERATURE[0]
+                    for i in range (len(ARRAY_TEMPERATURE)):
+                       if (ARRAY_TEMPERATURE[i]<MIN):
+                            MIN = ARRAY_TEMPERATURE[i]
+
+                    SOMME = 0        
+                    for i in range (len(ARRAY_TEMPERATURE)):
+                        SOMME += ARRAY_TEMPERATURE[i]
+
+                    MOYENNE = round(SOMME / len(ARRAY_TEMPERATURE),2)
+
+
+                    time.sleep(2)
+
+
+#___________EXPORT CSV HEADER__________
+data = []
+Csv_File_Name = '/home/'+username+'/.phoronix-test-suite/test-results/'+log_name+'_'+current_day+'_'+current_time+'Monitoring_Data.csv'
+header = ['Cpu_Usage','Temperature','Time']
+with open(Csv_File_Name,'w',newline="") as file:
+    csvwriter = csv.writer(file)
+    csvwriter.writerow(header)
+    for i in range(len(ARRAY_TEMPERATURE)):
+        data.append([ARRAY_CPU_USAGE[i],ARRAY_TEMPERATURE[i],ARRAY_TIME[i]])
+    csvwriter.writerows(data)
+#______________________________________
+
+
+print("\nMAX TEMP = "+str(MAX)+"C\n")
+print("\nMIN TEMP = "+str(MIN)+"C\n")
+print("\nAVERAGE TEMP = "+str(MOYENNE)+"C\n")    
+
+f.writelines("\nMAX TEMP = "+str(MAX)+"C\n")
+f.writelines("\nMIN TEMP = "+str(MIN)+"C\n")
+f.writelines("\nAVERAGE TEMP = "+str(MOYENNE)+"C\n")
+
+f.close()
