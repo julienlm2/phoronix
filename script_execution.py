@@ -46,6 +46,8 @@ os.environ['TEST_RESULTS_NAME']=ARGUMENT_LOG_NAME
 TOTAL_LOOP_TIME = int(TOTAL_LOOP_TIME)
 ARGUMENT_LOG_EXECUTION_TIME = (TOTAL_LOOP_TIME * 60) - 20
 
+#________________________________________________________________
+
 Info_Test_def = open('/home/'+username+'/.phoronix-test-suite/test-profiles/local/boucle/test-definition.xml','r')
 data = Info_Test_def.readlines()
 
