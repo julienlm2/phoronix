@@ -19,7 +19,7 @@ ARRAY_CPU_USAGE = []
 username = os.getlogin()
 
 if len(sys.argv) > 3 or len(sys.argv) == 2 or len(sys.argv) == 1:
-    print("Erreur, Le Script prend 2 parametre (Temps d'execution et Nom (plusieurs caractères))")
+    print("Erreur, Le Script prend 2 parametres (Temps d'execution et Nom (plusieurs caractères))")
     exit()
 temps_voulu = int(sys.argv[1])
 log_name=str(sys.argv[2])
@@ -52,7 +52,7 @@ while(time.time()<temps_fin and trigger):
 
     for line in Info_Sensors_Brut.splitlines():
         if "Core 0" in line.decode('utf-8'):
-
+                    
                     line_split = line.decode('utf-8').split("+")
                 
                     temp = line_split[1]
@@ -70,6 +70,7 @@ while(time.time()<temps_fin and trigger):
                             print("Cpu :"+str(usage)+"%",end='  ')
                             f.write("Cpu :"+str(usage)+"%  ")
                             #-----------CSV----------------
+                            usage = usage.replace(".",",")
                             ARRAY_CPU_USAGE.append(usage)
                             #------------------------------
                     #-----------CSV----------------
@@ -80,7 +81,7 @@ while(time.time()<temps_fin and trigger):
                     f.writelines(str(temperature)+"C")
                     f.writelines("  ["+str(current_time)+"]\n")
 
-                    ARRAY_TEMPERATURE.append(temperature)
+                    ARRAY_TEMPERATURE.append(math.trunc(temperature))
                     
                     
                     MAX = ARRAY_TEMPERATURE[0]
@@ -98,9 +99,9 @@ while(time.time()<temps_fin and trigger):
                         SOMME += ARRAY_TEMPERATURE[i]
 
                     MOYENNE = round(SOMME / len(ARRAY_TEMPERATURE),2)
+                    time.sleep(0.001)
 
-
-                    time.sleep(2)
+        
 
 
 #___________EXPORT CSV HEADER__________
