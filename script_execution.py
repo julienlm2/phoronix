@@ -60,6 +60,11 @@ Info_Test_def.writelines(data)
 Info_Test_def.close()
 
 result = datetime.now() + timedelta(minutes=TOTAL_LOOP_TIME+1) #Calcul de la durée estimé d'exécution 
+#_________________________Installation des tests________________________________________________
+run(["phoronix-test-suite","install","fio"])
+run(["phoronix-test-suite","install","mbw"])
+run(["phoronix-test-suite","install","libplacebo"])
+run(["phoronix-test-suite","install","stress-ng"])
 
 #_________________________Exécution de la suite de test_________________________________________
 
