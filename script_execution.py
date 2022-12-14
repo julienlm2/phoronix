@@ -65,6 +65,8 @@ run(["phoronix-test-suite","install","fio"])
 run(["phoronix-test-suite","install","mbw"])
 run(["phoronix-test-suite","install","libplacebo"])
 run(["phoronix-test-suite","install","stress-ng"])
+run(["phoronix-test-suite","install","boucle"])
+
 
 #_________________________Exécution de la suite de test_________________________________________
 
