@@ -2,7 +2,7 @@
 
 from subprocess import run
 from ast import Break
-from datetime import datetime
+from datetime import datetime,timedelta
 import subprocess
 import os
 import platform
@@ -46,8 +46,6 @@ os.environ['TEST_RESULTS_NAME']=ARGUMENT_LOG_NAME
 TOTAL_LOOP_TIME = int(TOTAL_LOOP_TIME)
 ARGUMENT_LOG_EXECUTION_TIME = (TOTAL_LOOP_TIME * 60) - 20
 
-#________________________________________________________________
-
 Info_Test_def = open('/home/'+username+'/.phoronix-test-suite/test-profiles/local/boucle/test-definition.xml','r')
 data = Info_Test_def.readlines()
 
@@ -56,9 +54,15 @@ data[22] = '<Arguments>'+str(ARGUMENT_LOG_EXECUTION_TIME)+' '+ARGUMENT_LOG_NAME+
 Info_Test_def = open('/home/'+username+'/.phoronix-test-suite/test-profiles/local/boucle/test-definition.xml','w')
 Info_Test_def.writelines(data)
 Info_Test_def.close()
-list_files = subprocess.run(["phoronix-test-suite", "stress-run", "testsmonitoring"])
+result = datetime.now() + timedelta(minutes=TOTAL_LOOP_TIME+1)
+print(str(current_time)+" : Benchmark in progress ... Estimated time of completion : "+result.strftime("%H:%M:%S"))
+list_files = subprocess.run(["phoronix-test-suite", "stress-run", "testsmonitoring"],capture_output=True).stdout
 
-print('Test Completed ...')
-print('Result saved to /.phoronix-test-suite/test-results/')
+log_phoronix = open('/home/'+username+'/.phoronix-test-suite/test-results/log_phoronix_'+ARGUMENT_LOG_NAME+'_'+current_day+'_'+current_time+'.txt', 'w')
+
+log_phoronix.writelines(list_files.decode('UTF-8').replace('','').replace('[0m','').replace('[1m','').replace('[1;32m','').replace('[1;30m','').replace('[1;31m','').replace('[1;34m',''))
+log_phoronix.close()
+print('Tests Completed ...')
+print('Results saved to /.phoronix-test-suite/test-results/')
 print('CSV file generated at /.phoronix-test-suite/test-results/')
 sys.exit()

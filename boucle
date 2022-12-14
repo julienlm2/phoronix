@@ -10,11 +10,11 @@ import time
 import math
 import sys
 import csv
-
 #______________________________________
 ARRAY_TIME = []
 ARRAY_CPU_USAGE = []
 #______________________________________
+
 
 username = os.getlogin()
 
@@ -42,8 +42,6 @@ while(time.time()<temps_fin and trigger):
     now = datetime.now()
 
     current_time = now.strftime("%H:%M:%S.%f")[:-3]
-
-
 
     Info_Sensors_Brut = run("sensors", capture_output=True).stdout
     Info_Usage_Brut = run(["mpstat","-P","ALL","2","1"], capture_output=True).stdout
@@ -104,7 +102,7 @@ while(time.time()<temps_fin and trigger):
         
 
 
-#___________EXPORT CSV HEADER__________
+#___________EXPORT CSV__________
 data = []
 Csv_File_Name = '/home/'+username+'/.phoronix-test-suite/test-results/'+log_name+'_'+current_day+'_'+current_time+'Monitoring_Data.csv'
 header = ['Cpu_Usage','Temperature','Time']
