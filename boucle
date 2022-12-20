@@ -14,13 +14,14 @@ import csv
 ARRAY_TIME = [] #Array pour export en .CSV
 ARRAY_CPU_USAGE = []
 
+trigger_erreur = True #déclencheur d'erreur
 
 username = os.getlogin()
 
 if len(sys.argv) > 3 or len(sys.argv) == 2 or len(sys.argv) == 1: #input validation 
     print("Erreur, Le Script prend 2 parametres (Temps d'execution et Nom (plusieurs caractères))")
     exit()
-
+    
 temps_voulu = int(sys.argv[1]) #récupération des arguments 
 log_name=str(sys.argv[2])
 
@@ -77,6 +78,12 @@ while(time.time()<temps_fin):
                     #------------------------------
 
                     print(str(temperature)+"C","["+str(current_time)+"]")
+
+                    if int(temperature) > 80 or int(temperature) < -40 and trigger_erreur == True:
+                        errors = open('/home/'+username+'/.phoronix-test-suite/test-results/ERRORS_'+log_name+'_'+current_day+'_'+current_time+'.txt', 'w') #création du fichier d'erreurs
+                        errors.writelines(f"Error, time : {current_time} - Temperature too high : {temperature}°C")
+                        trigger_erreur = False
+
                     f.writelines(str(temperature)+"C") #écriture de la charge cpu dans les logs
                     f.writelines("  ["+str(current_time)+"]\n") #écriture du temps dans les logs
 
