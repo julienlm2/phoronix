@@ -10,12 +10,15 @@ import time
 import math
 import sys
 import webbrowser
+import warnings
 
 username = os.getlogin()
 
 now = datetime.now()
 current_time = now.strftime("%H:%M:%S")
 current_day = now.strftime("%d-%m-%y")
+
+Test_status = True
 
 #set les variables d'environnement pour phoronix et input validation
 
@@ -66,20 +69,40 @@ run(["phoronix-test-suite","install","mbw"])
 run(["phoronix-test-suite","install","libplacebo"])
 run(["phoronix-test-suite","install","stress-ng"])
 run(["phoronix-test-suite","install","boucle"])
-
-
 #_________________________Exécution de la suite de test_________________________________________
 
-print(str(current_time)+" : Benchmark in progress ... Estimated time of completion : "+result.strftime("%H:%M:%S"))
-list_files = subprocess.run(["phoronix-test-suite", "stress-run", "testsmonitoring"],capture_output=True).stdout
+current_time = now.strftime("%H:%M:%S")
 
-#_________________________Sauvegarde des logs d'exécution________________________________________
+print(str(current_time)+" : Benchmark in progress ... Estimated time of completion : "+result.strftime("%H:%M:%S"))
 
 directory = '/home/'+username+'/.phoronix-test-suite/test-results/log_phoronix_'+ARGUMENT_LOG_NAME+'_'+current_day+'_'+current_time+'.txt'
 log_phoronix = open(directory, 'w')
-log_phoronix.writelines(list_files.decode('UTF-8').replace('','').replace('[0m','').replace('[1m','').replace('[1;32m','').replace('[1;30m','').replace('[1;31m','').replace('[1;34m',''))
 
-print('Tests Completed ...')
+list_files = subprocess.Popen(["phoronix-test-suite", "stress-run", "testsmonitoring"],stdout=subprocess.PIPE,stdin=subprocess.PIPE,text=True)
+
+for line in list_files.stdout:
+    print(line)
+    if "CPU Temperature" in line:
+        temp = line.split('     ')
+        tempint = int(temp[5].strip('.00').strip('    '))
+        if tempint > 80 or tempint < -40:
+            warnings.warn(f"{tempint}°C -> Température trop haute")
+            Test_status = False
+       
+    #_________________________Sauvegarde des logs d'exécution________________________________________
+    log_phoronix.writelines(line.replace('','').replace('[0m','').replace('[1m','').replace('[1;32m','').replace('[1;30m','').replace('[1;31m','').replace('[1;34m',''))
+
+
+list_files.wait()
+
+now = datetime.now()
+finish_time = now.strftime("%H:%M:%S")
+
+print(f'{finish_time} - Tests Completed ...')
+if Test_status == True:
+    print("Test Passed !")
+elif Test_status == False:
+    print("Test Failed !")
 print('Results saved to /.phoronix-test-suite/test-results/')
 print('CSV file generated at /.phoronix-test-suite/test-results/')
 #_________________________Ouverture du fichier log________________________________________________
