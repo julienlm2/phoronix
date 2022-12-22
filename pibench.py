@@ -2,11 +2,12 @@
 import time
 import math
 import sys
+from tqdm import tqdm
 
 start = time.time()
 tab = [] 
 iterations = int(sys.argv[1])
-for i in range(0,iterations):
+for i in tqdm(range(0,iterations)):
     for x in range(1,1000):
       3.141592 * 2**x
     for x in range(1,10000):
