@@ -10,6 +10,7 @@ import time
 import math
 import sys
 import csv
+import matplotlib.pyplot as plt
 
 ARRAY_TIME = [] #Array pour export en .CSV
 ARRAY_CPU_USAGE = []
@@ -43,7 +44,7 @@ while(time.time()<temps_fin):
     count = 0
     now = datetime.now()
 
-    current_time = now.strftime("%H:%M:%S.%f")[:-3]
+    current_time = now.strftime("%H:%M:%S")
 
     Info_Sensors_Brut = run("sensors", capture_output=True).stdout #récupération des données thermiques
     Info_Usage_Brut = run(["mpstat","-P","ALL","2","1"], capture_output=True).stdout #récupération des données de charge CPU
@@ -119,8 +120,31 @@ with open(Csv_File_Name,'w',newline="") as file:
     for i in range(len(ARRAY_TEMPERATURE)):
         data.append([ARRAY_CPU_USAGE[i],ARRAY_TEMPERATURE[i],ARRAY_TIME[i]])
     csvwriter.writerows(data)
-#______________________________________
 
+#__________________PLOT____________________
+
+for i in range(len(ARRAY_CPU_USAGE)):
+    ARRAY_CPU_USAGE[i] = float(ARRAY_CPU_USAGE[i].replace(",","."))
+
+x = ARRAY_TIME
+
+y = ARRAY_TEMPERATURE
+
+y2 = ARRAY_CPU_USAGE
+
+plt.plot(x,y, label = "Température (°C)")
+plt.plot(x,y2, label = "CPU Usage (%)")
+
+plt.xticks(rotation = 45) 
+
+plt.xlabel("Temps (H:M:S)")
+
+plt.title("Température en fonction du temps")
+
+
+plt.legend()
+
+#__________________________________________
 
 print("\nMAX TEMP = "+str(MAX)+"C\n")
 print("\nMIN TEMP = "+str(MIN)+"C\n")
@@ -130,5 +154,8 @@ print("\nAVERAGE TEMP = "+str(MOYENNE)+"C\n")
 f.writelines("\nMAX TEMP = "+str(MAX)+"C\n")
 f.writelines("\nMIN TEMP = "+str(MIN)+"C\n")
 f.writelines("\nAVERAGE TEMP = "+str(MOYENNE)+"C\n")
+
+plt.savefig('/home/'+username+'/.phoronix-test-suite/test-results/'+log_name+'_'+current_day+'_'+current_time+'graph.png')
+plt.show()
 
 f.close()
