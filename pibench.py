@@ -14,7 +14,6 @@ for i in range(0,iterations):
     for x in range(1,10000):
       float(3.141592) / x
 
-
 end = time.time()
 
 duration = round(end - start,3)
