@@ -14,7 +14,6 @@ import csv
 ARRAY_TIME = [] #Array pour export en .CSV
 ARRAY_CPU_USAGE = []
 
-trigger_erreur = True #déclencheur d'erreur
 
 username = os.getlogin()
 
@@ -79,10 +78,10 @@ while(time.time()<temps_fin):
 
                     print(str(temperature)+"C","["+str(current_time)+"]")
 
-                    if int(temperature) > 80 or int(temperature) < -40 and trigger_erreur == True:
+                    if int(temperature) > 80 or int(temperature) < -40:
                         errors = open('/home/'+username+'/.phoronix-test-suite/test-results/ERRORS_'+log_name+'_'+current_day+'_'+current_time+'.txt', 'w') #création du fichier d'erreurs
                         errors.writelines(f"Error, time : {current_time} - Temperature too high : {temperature}°C")
-                        trigger_erreur = False
+                        
 
                     f.writelines(str(temperature)+"C") #écriture de la charge cpu dans les logs
                     f.writelines("  ["+str(current_time)+"]\n") #écriture du temps dans les logs
@@ -119,8 +118,7 @@ with open(Csv_File_Name,'w',newline="") as file:
     for i in range(len(ARRAY_TEMPERATURE)):
         data.append([ARRAY_CPU_USAGE[i],ARRAY_TEMPERATURE[i],ARRAY_TIME[i]])
     csvwriter.writerows(data)
-#______________________________________
-
+#__________________________________________
 
 print("\nMAX TEMP = "+str(MAX)+"C\n")
 print("\nMIN TEMP = "+str(MIN)+"C\n")
@@ -131,4 +129,5 @@ f.writelines("\nMAX TEMP = "+str(MAX)+"C\n")
 f.writelines("\nMIN TEMP = "+str(MIN)+"C\n")
 f.writelines("\nAVERAGE TEMP = "+str(MOYENNE)+"C\n")
 
+errors.close()
 f.close()
