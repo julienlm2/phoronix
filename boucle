@@ -14,8 +14,6 @@ import csv
 ARRAY_TIME = [] #Array pour export en .CSV
 ARRAY_CPU_USAGE = []
 
-errors = ''
-
 username = os.getlogin()
 
 if len(sys.argv) > 3 or len(sys.argv) == 2 or len(sys.argv) == 1: #input validation 
