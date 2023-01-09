@@ -24,12 +24,12 @@ def bench(x):
             float(3.141592) / x
 
 if __name__ == '__main__':
-    processes = cpu_count()
-    print ('utilizing %d cores\n' % processes)
-    pool = Pool(processes)
-    pool.map(bench, range(processes))
+    processes = cpu_count() #processes = 4 (intel i3-3220)
+    print ('utilizing %d CPU(s)\n' % processes) 
+    pool = Pool(processes) #pool(4)
+    pool.map(bench, range(processes)) # -> 0 1 2 3
     pool.close()
-    pool.join()
+    pool.join() #attente de fin du pool
     end = time.time()
-    duration = round(end - start,3)
+    duration = round(end - start,3) #calcul du temps d'exécution
     print(f"Time taken: {duration}")
